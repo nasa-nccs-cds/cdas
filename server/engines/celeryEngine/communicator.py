@@ -1,5 +1,5 @@
 from engines.communicator import ComputeEngineCommunicator, TaskMonitor
-from tasks import execute
+from tasks import execute, executeAll
 
 class CeleryTaskMonitor(TaskMonitor):
 
@@ -39,7 +39,10 @@ class CeleryCommunicator( ComputeEngineCommunicator ):
 
 
     def submitTaskImpl( self, task_request, worker ):
-        task = execute.apply_async( (task_request.task,), exchange='C.dq', routing_key=worker )
+        if worker == "*":
+            task = executeAll.apply_async( (task_request.task,) )
+        else:
+            task = execute.apply_async( (task_request.task,), exchange='C.dq', routing_key=worker )
         return CeleryTaskMonitor( task.id, task=task )
 
     def initWorkerStats(self):

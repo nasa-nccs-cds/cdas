@@ -1,4 +1,14 @@
 from modules.configuration import CDAS_CELERY_BACKEND
+from kombu.common import Broadcast
+
+CELERY_QUEUES = (Broadcast('broadcast_tasks'), )
+
+CELERY_ROUTES = {
+        'tasks.executeAll': {
+            'queue': 'broadcast_tasks',
+            'routing_key': 'task.#',
+        },
+}
 ## Broker settings.
 
 if CDAS_CELERY_BACKEND == 'amqp':

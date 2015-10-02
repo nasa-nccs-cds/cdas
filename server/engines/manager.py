@@ -109,7 +109,7 @@ class ComputeEngine( Executable ):
         cached_var = self.cachedVariables.get( var_cache_id, None )
         return cached_var.uncache( region ) if cached_var is not None else []
 
-    def  getWorkerCacheStats(self):
+    def getWorkerCacheStats(self):
         cache_task_request = TaskRequest( utility='worker.cache' )
         cache_task_monitor = self.communicator.submitTask( cache_task_request, "*" )
         workerCacheStats = cache_task_monitor.response()
@@ -230,9 +230,9 @@ if __name__ == '__main__':
         return task_args
 
     engine = engineRegistry.getInstance( CDAS_COMPUTE_ENGINE + "Engine" )
-    ctask_args = getCacheTaskArgs()
+#    ctask_args = getCacheTaskArgs()
     t0 = time.time()
-    ctask      = engine.execute( TaskRequest( request=ctask_args ), async=False )
+#    ctask      = engine.execute( TaskRequest( request=ctask_args ), async=False )
     task_args = getTaskArgs( op=operations[ 0:2 ] )
     results = engine.execute( TaskRequest( request=task_args ) )
     result_data = results[0]['data']
