@@ -10,6 +10,9 @@ class RegionReductionStrategy:
     def getReducedRegion( self, region, **args ):
         return region
 
+    def getReducedRegions( self, region, slices, **args  ):
+        pass
+
 class StrategyManager:
 
     def __init__( self ):
@@ -17,13 +20,18 @@ class StrategyManager:
         self.strategy_spec = configuration.CDAS_REDUCTION_STRATEGY[ self.StrategyClass.__name__ ]
         self.load()
 
-    def getStrategy(self, region, **args ):
+    def getStrategy( self ):
         return self.strategies[ self.strategy_spec['id'] ]
 
     def getReducedRegion( self, region, **args ):
         strategy = self.getStrategy( region, **args  )
         assert strategy is not None, "Error, undefined decomposition strategy."
         return strategy.getReducedRegion( region, **args  )
+
+    def getReducedRegions( self, region, slices, **args ):
+        strategy = self.getStrategy()
+        assert strategy is not None, "Error, undefined decomposition strategy."
+        return strategy.getReducedRegions( region, slices, **args  )
 
     def load(self):
         import strategies
@@ -34,4 +42,3 @@ class StrategyManager:
                     self.strategies[ cls.ID ] = cls( **self.strategy_spec )
                 except Exception, err:
                     wpsLog.error( "StrategyManager load error: %s " % str( err ) )
-

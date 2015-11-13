@@ -136,6 +136,7 @@ class ComputeEngine( Executable ):
         self.communicator.submitTask( transfer_task_request, [ source_worker, destination_worker ] )
 
     def execute( self, task_request, **compute_args ):
+        from decomposition.strategies import decompositionManager
         try:
             t0 = time.time()
             self.invocation_index += 1
@@ -180,22 +181,26 @@ class ComputeEngine( Executable ):
                             cached_var,cached_domain = self.findCachedDomain( var_cache_id, op_region, dataset )
                             wpsLog.debug( " Find Cached Domain, cached_var: %s, cached_domain: %s" % ( str(cached_var), str(cached_domain) ) )
                             if cached_domain is None:
-                                cache_axis_list = [CDAxis.LEVEL] if operation else [CDAxis.LEVEL, CDAxis.LATITUDE, CDAxis.LONGITUDE, CDAxis.TIME]
-                                cache_region = Region( op_region.filter_spec( cache_axis_list ) )
-                                cache_op_args = { 'region':cache_region, 'data':str(dataset) }
-                                tc0 = time.time()
-                                cache_task_request = TaskRequest( task=cache_op_args )
-                                cache_worker = self.communicator.getNextWorker(True)
-                                cache_task_monitor = self.communicator.submitTask( cache_task_request, cache_worker )
-                                executionRecord.addRecs( cache_add=cache_region.spec, cache_add_worker = cache_worker )
-                                tc01 = time.time()
-                                cached_domain = cached_var.addDomain( cache_region, queue=cache_worker )
-                                self.pendingTasks[ cache_task_monitor ] = cached_domain
-                                tc1 = time.time()
-                                wpsLog.debug( " ***** Caching data [rid:%s] to worker '%s' ([%.2f,%.2f,%.2f] dt = %.3f): args = %s " %  ( cache_task_monitor.rid, cache_worker, tc0, tc01, tc1, (tc1-tc0), str(cache_op_args) ) )
-                                if op_region == cache_region:
-                                    designated_worker = cache_worker
-                                    wait_for_cache = True
+#                                cache_axis_list = [CDAxis.LEVEL] if operation else [CDAxis.LEVEL, CDAxis.LATITUDE, CDAxis.LONGITUDE, CDAxis.TIME]
+#                                cache_region = Region( op_region.filter_spec( cache_axis_list ) )
+                                op_slices = [ op['slice'] for op in operation ]
+                                decomposition = decompositionManager.getReducedRegions( op_region, op_slices )
+                                for decomp_chunk in decomposition.chunks:
+                                    cache_region = decomp_chunk.region
+                                    cache_op_args = { 'region':cache_region, 'data':str(dataset) }
+                                    tc0 = time.time()
+                                    cache_task_request = TaskRequest( task=cache_op_args, slices = op_slices )
+                                    cache_worker = self.communicator.getNextWorker(True)
+                                    cache_task_monitor = self.communicator.submitTask( cache_task_request, cache_worker )
+                                    executionRecord.addRecs( cache_add=cache_region.spec, cache_add_worker = cache_worker )
+                                    tc01 = time.time()
+                                    cached_domain = cached_var.addDomain( cache_region, queue=cache_worker )
+                                    self.pendingTasks[ cache_task_monitor ] = cached_domain
+                                    tc1 = time.time()
+                                    wpsLog.debug( " ***** Caching data [rid:%s] to worker '%s' ([%.2f,%.2f,%.2f] dt = %.3f): args = { %s } " %  ( cache_task_monitor.rid, cache_worker, tc0, tc01, tc1, (tc1-tc0),  ', '.join( [ "%s:%s" % (key,str(val)) for key,val in cache_op_args.items() ] ) ) )
+                                    if op_region == cache_region:
+                                        designated_worker = cache_worker
+                                        wait_for_cache = True
                             else:
                                 worker_id, cache_request_status = cached_domain.getCacheStatus()
                                 executionRecord.addRecs( cache_found=cache_request_status, cache_found_domain=cached_domain.spec, cache_found_worker=worker_id )
@@ -212,7 +217,7 @@ class ComputeEngine( Executable ):
                 else:
                     executionRecord.addRecs( designated= True, designated_worker= designated_worker )
 
-                if async:
+                if not embedded:
                     op_index = int(100*time.time())
                     result_names = [ "r%d-%d-%d.nc"%(ivar,self.invocation_index,op_index) for ivar in range(len(operation)) ]
                     task_request['result_names'] = result_names

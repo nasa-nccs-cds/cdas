@@ -9,6 +9,7 @@ from modules import configuration
 cdms2.setNetcdfShuffleFlag(0)
 cdms2.setNetcdfDeflateFlag(0)
 cdms2.setNetcdfDeflateLevelFlag(0)
+cdms2.setNetcdfUseParallelFlag(1)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output'))
 
 class Aliases:
@@ -191,7 +192,7 @@ class CDASKernel:
 
     def setTimeBounds( self, var ):
         time_axis = var.getTime()
-        if time_axis.bounds is None:
+        if not hasattr(time_axis, 'bounds') or time_axis.bounds is None:
             try:
                 time_unit = time_axis.units.split(' since ')[0].strip()
                 if time_unit == 'hours':

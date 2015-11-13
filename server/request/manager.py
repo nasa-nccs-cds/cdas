@@ -47,25 +47,26 @@ class TaskRequest:
     def __init__( self, **args  ):
         from request.api.manager import apiManager
         self.task = {}
+        cargs = dict(args)
         request_parameters = args.get( 'request', None )
         if request_parameters:
      #       wpsLog.debug( "---"*50 + "\n $$$ NEW TASK REQUEST: request = %s \n" % str(request_parameters) )
             dialect = apiManager.getDialect( request_parameters )
             self.task = dialect.getTaskRequestData( request_parameters )
+            del cargs['request']
         task_parameters = args.get( 'task', None )
         if task_parameters:
             self.task = task_parameters
+            del cargs['task']
      #       wpsLog.debug( "---"*50 + "\n $$$ NEW TASK REQUEST: task = %s \n" % str(task_parameters) )
         config_args = self.task.setdefault( 'config', {} )
         cache_val = config_args.setdefault( 'cache', True )
-        utility = args.get( 'utility', None )
-        if utility: config_args['utility'] = utility
-
+        config_args.update(cargs)
 
     def genericize(self):
         return self.task
 
-    def __str__(self): return "TR-%s" % str(self.task)
+    def __str__(self): return "TR-[%s]" % ', '.join( [ "%s:%s" % (key,str(val)) for key,val in self.task.items() ] )
 
     def getRequestArg( self, id, default=None ):
         return self.task.get( id, default )

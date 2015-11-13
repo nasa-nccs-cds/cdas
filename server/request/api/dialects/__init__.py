@@ -1,5 +1,5 @@
 import json, sys
-from modules.utilities import wpsLog, convert_json_str
+from modules.utilities import *
 
 class WPSDialect:
 
@@ -33,6 +33,7 @@ class WPSDialect:
                     try:
                         parameter = json.loads( parameter )
                     except:
+                        debug_trace()
                         wpsLog.error( " Error json decoding parameter: '%s' " % parameter )
                         parameter = ""
                 task_parameters[ key ] = parameter

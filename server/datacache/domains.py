@@ -33,7 +33,7 @@ class CDAxis(JSONObject):
 
     @classmethod
     def is_axis(cls, spec):
-        return isinstance(spec,dict) and isinstance( spec.get('config',None), dict ) and isinstance( spec.get('bounds',None), list )
+        return isinstance(spec,dict) and isinstance( spec.get('config',None), dict ) and  isinstance( spec.get('bounds',None), (list, tuple) )
 
     @classmethod
     def identify_axis( cls, axis_name ):

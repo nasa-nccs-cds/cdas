@@ -8,6 +8,8 @@ CDAS_PERSISTENCE_DIRECTORY = "~/.cdas/persistence"
 
 CDAS_DEFAULT_NUM_NODES = 1
 
+CDAS_MAX_CHUNK_SIZE = 100000000
+
 CDAS_STAGING = 'local'
 #CDAS_STAGING = 'celery'
 
@@ -32,6 +34,7 @@ CDAS_COLLECTIONS = [ ('MERRA/mon/atmos',       { 'type':'dods', 'url':'http://dp
                      ('ECMWF/6hr/atmos',       { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/ECMWF/6hr/atmos' } ),
                      ('MERRA/mon/atmos/ta',    { 'type':'file', 'url':'/usr/local/web/WPCDAS/data/atmos_ta.nc' } ),
                      ('MERRA/mon/atmos/ua',    { 'type':'file', 'url':'/usr/local/web/WPCDAS/data/atmos_ua.nc' } ),
+                     ('MERRA/mon/atmos/td',    { 'type':'file', 'url':'/usr/local/web/data/MERRA/denis/MERRA2_400.instM_3d_ana_Np.2011.xml' } )
                      ]
 
 MERRA_TEST_VARIABLES = {"collection": "MERRA/mon/atmos", "vars": [ "hur", "clt", "ua" ] }

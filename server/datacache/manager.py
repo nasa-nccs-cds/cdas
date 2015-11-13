@@ -286,7 +286,6 @@ class DataManager:
         return rv
 
     def loadVariable( self, data, region, cache_type ):
-        from decomposition.strategies import decompositionManager
         data_specs = {}
         domain =  None
         dataset = None
@@ -317,7 +316,9 @@ class DataManager:
                     variable = dataset[name]
                     data_specs['region'] = region
                 else:
-                    load_region = decompositionManager.getReducedRegion( region ) if (cache_type == CachedVariable.CACHE_REGION) else region
+                    debug_trace()
+#                    load_region = decompositionManager.getReducedRegion( region ) if (cache_type == CachedVariable.CACHE_REGION) else region
+                    load_region = region
                     cache_region = Region( load_region, axes=[ CDAxis.LATITUDE, CDAxis.LONGITUDE, CDAxis.LEVEL ] )
                     if dataset == None: dataset = self.loadFileFromCollection( collection, name )
                     variable = self.load_variable_region( dataset, name, cache_region )
@@ -355,16 +356,20 @@ if __name__ == "__main__":
 
     dfile = '/usr/local/web/WPCDAS/data/atmos_ta.nc'
     varname = "ta"
+
+    dfile = '/usr/local/web/data/MERRA/denis/MERRA2_400.instM_3d_ana_Np.2011.xml'
+    varname = "T"
     dataset = f=cdms2.open(dfile)
     var = dataset[ varname ]
-    vdata = var( time = slice(0,1) )
+    print str( var.shape )
+    vdata = var( level = slice(0,1) )
     print str( vdata.shape )
 
-    data_file = os.path.join( configuration.CDAS_OUTGOING_DATA_DIR, varname )
-    print "----"*50 + "\nSaving result to file: '%s'\n" % ( data_file ) + "----"*50
-    f=cdms2.open(data_file,"w")
-    f.write(vdata)
-    f.close()
+#    data_file = os.path.join( configuration.CDAS_OUTGOING_DATA_DIR, varname )
+#    print "----"*50 + "\nSaving result to file: '%s'\n" % ( data_file ) + "----"*50
+#    f=cdms2.open(data_file,"w")
+#    f.write(vdata)
+#    f.close()
 
     # dfile = 'http://dataserver.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/hur.ncml'
     # slice_args = {'lev': (100000.0, 100000.0, 'cob')}

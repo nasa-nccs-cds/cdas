@@ -91,7 +91,6 @@ def getRequestParms( request ):
           if ( param == 'embedded' ) and ( paramVal == 'true' ):   parmMap['embedded']  = True
           if ( param == 'async' ) and ( paramVal == 'true' ):   parmMap['async']  = True
           if ( param == 'datainputs' ):
-            debug_trace()
             value_cut = requestParm.find('=')
             di_params = requestParm[value_cut+1:].strip('[]').lower().split(';')
             for di_param in di_params:
