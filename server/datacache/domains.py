@@ -111,6 +111,9 @@ class Region(JSONObject):
             wpsLog.error( "Error in getAxisRange( %s ): %s" % ( axis_name, str(err) ) )
             return None
 
+    def subdivide( decomp_axis, chunk_size=1 ):
+        pass
+
     def getIndexedAxisSize(self, axis_name, axis ):
         axis_spec = self.getItem( axis_name )
         if axis_spec is None: return axis.shape[0]

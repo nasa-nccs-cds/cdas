@@ -1,42 +1,76 @@
 from modules import configuration
 from modules.utilities import *
+from collections import OrderedDict
 from datacache.domains import Region, CDAxis
 from decomposition.manager import StrategyManager, RegionReductionStrategy
 
-def get_global_size( shape ):
-    size = 1
-    for sval in shape: size *= sval
-    return size
+
+class CacheGrid:
+    def __init__( self, index_bounds, axes ):
+        self.grid = OrderedDict()
+        for bnds, a in zip( index_bounds, axes ):
+           self.grid[a] = bnds
+
+    def size( self ):
+        size = 1
+        for bnds in self.grid.values(): size *= bnds[1] - bnds[0]
+        return size
+
+    def axes(self):
+        return self.grid.keys()
+
+    def ordered_axes( self, ordered_axis_list="tzyx" ):
+        grid_axes = ''
+        for axis in ordered_axis_list:
+            if axis in self.grid.axes():
+               grid_axes += axis
+        return grid_axes
 
 class Decomposition:
 
-    def __init__( self, chunks, global_region, **args ):
-        self.chunks = chunks
-        self.region = global_region
+    def __init__( self, cache_grid, **args ):
+        self.chunks = []
+        self.grid = cache_grid
 
-    @staticmethod
-    def getAxis( grid, slices ):
+    def add(self, chunk ):
+        self.chunks.append( chunk )
+
+    def getAxis( self, slices ):
         merged_slices = ""
         for slice in slices:
             for s in slice:
                 if s not in merged_slices:
                     merged_slices += s
         decomp_axis = 't'
-        grid_axes = ''
-        for axis in "tzyx":
-            if axis in grid:
-               grid_axes += axis
-        for axis in grid_axes:
+        for axis in self.grid.ordered_axes():
             if axis not in merged_slices:
                 decomp_axis = axis
                 break
-        return decomp_axis
+        return decomp_axis, self.grid[decomp_axis]
 
 class DecompositionChunk:
 
-    def __init__( self, shape, subregion ):
-        self.region = subregion
-        self.shape = shape
+    def __init__( self, axis_intervals=[] ):
+        self.axis_intervals = axis_intervals
+
+    def append( self, axis_interval ):
+        self.axis_intervals.append( axis_interval )
+
+    def __len__(self):
+        return len(self.axis_intervals)
+
+    def __getitem__(self, index):
+        return self.axis_intervals[ index ]
+
+    def __iter__(self):
+        return self.axis_intervals.__iter__()
+
+class AxisInterval:
+
+    def __init__( self, axis_index, interval_range, coord_system="indexed" ):
+        self.axis = axis_index
+        self.interval = interval_range
+        self.system = coord_system
 
 class DecompositionStrategy(RegionReductionStrategy):
 
@@ -74,35 +108,26 @@ class SpaceStrategy( DecompositionStrategy ):
                    node_region[ dim_name ] = ( r0, r1 )
                    return node_region
 
-    def getReducedRegions( self, global_shape, global_region, grid, slices, ncores, **args  ):
-        global_size = get_global_size( global_shape )
+    def getReducedRegions( self, cache_grid, slices, ncores, **args  ):
+        global_size = cache_grid.get_size()
         nchunks_suggestion = ( global_size / self.max_chunk_size ) + 1
+        decomp = Decomposition( cache_grid )
         if nchunks_suggestion > 1:
-            decomp_axis = Decomposition.getAxis(grid,slices)
-            axis_index = grid.find( decomp_axis )
-            axis_size = global_shape[axis_index]
+            decomp_axis, axis_bounds = decomp.getAxis( slices )
+            axis_size = axis_bounds[1] - axis_bounds[0]
             if axis_size < ncores:
-                chunk_shape = list( global_shape )
-                chunk_shape[axis_index] = 1
-                subregions = global_region.subdevide( decomp_axis, axis_size )
-                chunks = [ DecompositionChunk( chunk_shape, sr ) for sr in subregions ]
+                for iChunk in range(axis_bounds[0],axis_bounds[1]):
+                    decomp.add( DecompositionChunk( AxisInterval( decomp_axis, [iChunk,iChunk+1] ) ) )
             else:
                 base_chunk_multiplicity = axis_size / ncores
-                remainder = axis_size - base_chunk_multiplicity * ncores
-                chunks = []
-                chunk_start_location = 0
+                value_shift = axis_size - base_chunk_multiplicity * ncores
+                chunk_start_location = axis_bounds[0]
                 for iChunk in range(ncores):
-                    chunk_shape = list( global_shape )
-                    chunk_multiplicity = base_chunk_multiplicity if (iChunk > remainder) else base_chunk_multiplicity+1
-                    chunk_shape[axis_index] = chunk_multiplicity
+                    chunk_multiplicity = base_chunk_multiplicity if (iChunk > value_shift) else base_chunk_multiplicity+1
                     chunk_end_location = chunk_start_location + chunk_multiplicity
-                    sr = global_region.get_subdivision( decomp_axis, [ chunk_start_location/float(axis_size), chunk_end_location/float(axis_size) ] )
-                    chunks.append( DecompositionChunk( chunk_shape, sr ) )
+                    decomp.add( DecompositionChunk( AxisInterval( decomp_axis, [ chunk_start_location, chunk_end_location ] )  ) )
                     chunk_start_location = chunk_end_location
-
-            decomp = Decomposition( chunks, global_region, global_shape )
-
-
+        return decomp
 
 
 class TimeSubsetStrategy( DecimationStrategy ):
