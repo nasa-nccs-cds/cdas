@@ -8,6 +8,11 @@ class RegionContainer(JSONObjectContainer):
     def newObject( self, spec ):
         return Region(spec)
 
+    def getRegion(self,id):
+        for region in self.values:
+            if region.id == id:
+                return region
+
 
 class CDAxis(JSONObject):
     LEVEL = 'lev'
@@ -111,8 +116,8 @@ class Region(JSONObject):
             wpsLog.error( "Error in getAxisRange( %s ): %s" % ( axis_name, str(err) ) )
             return None
 
-    def subdivide( decomp_axis, chunk_size=1 ):
-        pass
+    def addAxisBounds(self, axis, cdaxis ):
+        self[axis] = cdaxis.get_spec()
 
     def getIndexedAxisSize(self, axis_name, axis ):
         axis_spec = self.getItem( axis_name )

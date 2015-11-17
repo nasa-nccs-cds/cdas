@@ -2,13 +2,35 @@ from modules import configuration
 from modules.utilities import  *
 
 class Collection:
-    def __init__( self, name, collection_spec ):
+    def __init__( self, name, collection_spec, **args ):
         self.open_files = {}
         self.name = name
         self.cache_open_files = True
         self.server_type = collection_spec.get('type', 'file')
         self.base_url = collection_spec['url']
+        load_dims = args.get('load_dims',False)
+        if load_dims: self.init_dims(collection_spec)
  #       self.initialize( collection_spec.get( 'open', [] ) )
+
+    def init_dims( self, spec ):
+        self.dims = spec.get('dims',None)
+        if self.dims is None:
+            if self.server_type == 'file':
+                file = self.loadFile()
+                self.loadFileMetadata(file)
+                file.close()
+
+    def loadFileMetadata(self,file):
+        self.dims = {}
+        for aname,axis in file.axes.items():
+            try: self.dims[axis.axis.lower()] = (0,axis.shape[0])
+            except: pass
+
+    def get_dims( self, var_id ):
+        if self.dims is None:
+            f = self.getFile(var_id)
+            self.loadFileMetadata(f)
+        return self.dims
 
     def initialize( self, open_list ):
         for var_id in open_list:
@@ -26,6 +48,7 @@ class Collection:
             return self.base_url
 
     def getFile( self, var_id ):
+#        debug_trace()
         pid = str(os.getpid())
         cache_key = pid if self.server_type == 'file' else '.'.join([var_id,pid] )
         file = self.open_files.get( cache_key, None )
@@ -51,11 +74,12 @@ class CollectionManager:
     CollectionManagers = {}
 
     @classmethod
-    def getInstance(cls,name,**args):
-        return cls.CollectionManagers.setdefault( name, CollectionManager(name,**args) )
+    def getInstance(cls,name):
+        return cls.CollectionManagers.setdefault( name, CollectionManager(name) )
 
-    def __init__( self, name ):
+    def __init__( self, name, **args  ):
         self.collections = {}
+        self.load_dims = args.get('load_dims',False)
 
     def close(self):
         return [ collection.close() for collection in self.collections.values() ]
@@ -69,8 +93,8 @@ class CollectionManager:
         collection = self.getCollection( collection_name )
         return collection.getURL( var_id )
 
-    def addCollection(self, collection_name, collection_rec ):
-        self.collections[ collection_name ] = Collection( collection_name, collection_rec )
+    def addCollection(self, collection_name, collection_rec, **args ):
+        self.collections[ collection_name ] = Collection( collection_name, collection_rec, **args )
 
     def getCollection(self, collection_name  ):
         try:
@@ -80,10 +104,10 @@ class CollectionManager:
 
 
 def getCollectionManger(**args):
-    collectionManager = CollectionManager.getInstance( configuration.CDAS_APPLICATION, **args )
+    collectionManager = CollectionManager.getInstance( configuration.CDAS_APPLICATION )
     collections = configuration.CDAS_COLLECTIONS
     for collection_spec in collections:
-        collectionManager.addCollection( collection_spec[0], collection_spec[1] )
+        collectionManager.addCollection( collection_spec[0], collection_spec[1], **args )
     return collectionManager
 
 def cache_load_test():
@@ -113,15 +137,19 @@ if __name__ == "__main__":
 #    TestVariable = getVariable( 0, CacheLevel )
 #    data = TestVariable.data
 
-    import os, numpy, numpy.ma as ma
-    cached_file = os.path.expanduser( '~/.cdas/testing/MERRA_mon_atmos_hur' )
-    data = numpy.fromfile( cached_file, dtype=numpy.float32 ).reshape( (432, 144, 288) )
-    FillVal = 1.00000002e+20
-    mdata = ma.masked_greater( data, 0.90000002e+20 )
-    t0 = time.time()
-    a = ma.average(data,0)
-    t1 = time.time()
-    print "Result computed in %.2f, shape = %s, sample=%s" % ( (t1-t0), str(a.shape), a.flatten()[0:10])
+    ds_spec = { 'type':'file', 'url':'/usr/local/web/WPCDAS/data/atmos_ta.nc' }
+    c = Collection( 'ta', ds_spec )
+
+
+    # import os, numpy, numpy.ma as ma
+    # cached_file = os.path.expanduser( '~/.cdas/testing/MERRA_mon_atmos_hur' )
+    # data = numpy.fromfile( cached_file, dtype=numpy.float32 ).reshape( (432, 144, 288) )
+    # FillVal = 1.00000002e+20
+    # mdata = ma.masked_greater( data, 0.90000002e+20 )
+    # t0 = time.time()
+    # a = ma.average(data,0)
+    # t1 = time.time()
+    # print "Result computed in %.2f, shape = %s, sample=%s" % ( (t1-t0), str(a.shape), a.flatten()[0:10])
 
 
 

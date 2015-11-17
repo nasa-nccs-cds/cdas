@@ -7,11 +7,6 @@ class RegionReductionStrategy:
     def __init__( self, **args ):
         pass
 
-    def getReducedRegion( self, region, **args ):
-        return region
-
-    def getReducedRegions( self, region, slices, **args  ):
-        pass
 
 class StrategyManager:
 
@@ -22,16 +17,6 @@ class StrategyManager:
 
     def getStrategy( self ):
         return self.strategies[ self.strategy_spec['id'] ]
-
-    def getReducedRegion( self, region, **args ):
-        strategy = self.getStrategy( region, **args  )
-        assert strategy is not None, "Error, undefined decomposition strategy."
-        return strategy.getReducedRegion( region, **args  )
-
-    def getReducedRegions( self, region, slices, **args ):
-        strategy = self.getStrategy()
-        assert strategy is not None, "Error, undefined decomposition strategy."
-        return strategy.getReducedRegions( region, slices, **args  )
 
     def load(self):
         import strategies

@@ -9,7 +9,7 @@ from modules import configuration
 cdms2.setNetcdfShuffleFlag(0)
 cdms2.setNetcdfDeflateFlag(0)
 cdms2.setNetcdfDeflateLevelFlag(0)
-cdms2.setNetcdfUseParallelFlag(1)
+# cdms2.setNetcdfUseParallelFlag(1)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'output'))
 
 class Aliases:

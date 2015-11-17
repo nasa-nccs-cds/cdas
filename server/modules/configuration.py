@@ -26,7 +26,7 @@ CDAS_DATA_CACHE = 'default'
 CDAS_CELERY_BACKEND = 'redis'
 # Application definition
 
-CDAS_COLLECTIONS = [ ('MERRA/mon/atmos',       { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/' } ),
+CDAS_COLLECTIONS = [ ('MERRA/mon/atmos',       { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/'} ),
                      ('CFSR/mon/atmos',        { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/CFSR/mon/atmos' } ),
                      ('ECMWF/mon/atmos',       { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/ECMWF/mon/atmos' } ),
                      ('MERRA/6hr/atmos',       { 'type':'dods', 'url':'http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/6hr/atmos' } ),
