@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
     def read_test():
         import cdms2
-        data_url =  "http://dptomcat01.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/ta.ncml"
+        data_url =  "http://dataserver.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/ta.ncml"
         f=cdms2.open(data_url,'r')
         v = f['ta']
         print "read variable 'hur', shape = %s" % str( v.shape )

@@ -353,18 +353,24 @@ if __name__ == "__main__":
     wpsLog.addHandler( logging.StreamHandler(sys.stdout) )
     wpsLog.setLevel(logging.DEBUG)
 
-    dfile = '/usr/local/web/WPCDAS/data/atmos_ta.nc'
-    varname = "ta"
-    dataset = f=cdms2.open(dfile)
-    var = dataset[ varname ]
-    vdata = var( time = slice(0,1) )
-    print str( vdata.shape )
+ #    dfile = '/usr/local/web/WPCDAS/data/atmos_ta.nc'
+ #    varname = "ta"
+ #    dataset = f=cdms2.open(dfile)
+ #    var = dataset[ varname ]
+ #    vdata = var( time = slice(0,1) )
+ #    print str( vdata.shape )
+ #
+ #    data_file = os.path.join( configuration.CDAS_OUTGOING_DATA_DIR, varname )
+ #    print "----"*50 + "\nSaving result to file: '%s'\n" % ( data_file ) + "----"*50
+ #    f=cdms2.open(data_file,"w")
+ #   f.write(vdata)
+ #   f.close()
 
-    data_file = os.path.join( configuration.CDAS_OUTGOING_DATA_DIR, varname )
-    print "----"*50 + "\nSaving result to file: '%s'\n" % ( data_file ) + "----"*50
-    f=cdms2.open(data_file,"w")
-    f.write(vdata)
-    f.close()
+    url = "http://dataserver.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/ta.ncml"
+    url1 = "http://dataserver.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/ta.ncml"
+    f=cdms2.open(url,"r")
+    v = f['ta']
+    print v.shape
 
     # dfile = 'http://dataserver.nccs.nasa.gov/thredds/dodsC/bypass/CREATE-IP/MERRA/mon/atmos/hur.ncml'
     # slice_args = {'lev': (100000.0, 100000.0, 'cob')}

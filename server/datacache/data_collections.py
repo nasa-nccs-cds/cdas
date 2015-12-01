@@ -36,14 +36,15 @@ class Collection:
 
     def loadFile(self, var_id=None ):
         import cdms2
-        wpsLog.debug( " CDAS Collection: Opening File <%s>, var: %s " % ( self.base_url, var_id ) )
         if self.server_type == 'file':
+            wpsLog.debug( " CDAS Collection: Opening File <%s>, var: %s " % ( self.base_url, var_id ) )
             if self.base_url[:7]=="file://":
                 f=cdms2.open(str(self.base_url[6:]),'r')
             else:
                 f=cdms2.open(str(self.base_url),'r')
         else:
             url = self.getURL( var_id )
+            wpsLog.debug( " CDAS Collection: Opening URL <%s>, var: %s " % ( url, var_id ) )
             f=cdms2.open(str(url),'r')
         return f
 
