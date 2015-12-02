@@ -141,8 +141,11 @@ class CDASKernel:
             output_data_dir =  configuration.CDAS_OUTGOING_DATA_DIR
             data_url = configuration.CDAS_OUTGOING_DATA_URL + varname
             wpsLog.debug( "----"*50 + "\nSaving result to directory: '%s', file: '%s', url: '%s'\n" % ( output_data_dir, varname, data_url ) + "----"*50 )
-            os.chdir( output_data_dir )
-            f=cdms2.open( varname, "w" )
+            realpath = os.path.realpath( os.path.join(output_data_dir,varname) )
+            if not os.path.samefile( os.path.dirname(realpath), output_data_dir ):
+                wpsLog.error( "----"*50 + "\nError, attempt to write to unauthorized directory: '%s'\n" % ( realpath ) + "----"*50 )
+                return "ERROR"
+            f=cdms2.open( realpath, "w" )
             f.write(data)
             f.close()
             return data_url

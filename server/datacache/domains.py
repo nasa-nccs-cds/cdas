@@ -84,6 +84,8 @@ class CDAxis(JSONObject):
                         self['config'] = filter_attributes( values, ['start','end','value'], False )
                     except KeyError:
                         wpsLog.error( "Error, can't recognize region values keys: %s " % values.keys() )
+                    except TypeError, err:
+                        wpsLog.error( "\n !!!TypeError processing axis bounds: %s %s \n" % ( start, end ) )
             else:
                 self['bounds'] = [ float(v) for v in values ] if self['axis'] <> CDAxis.TIME else values
         else:
