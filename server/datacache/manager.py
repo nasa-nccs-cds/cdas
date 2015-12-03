@@ -275,7 +275,7 @@ class DataManager:
             wid = self.cacheManager.name
             variable = dataset[name]
             load_region = region # decimationManager.getReducedRegion( region, axes=variable.getAxisList() )
-            cdms2_cache_args = load_region.toCDMS()
+            cdms2_cache_args = load_region.toCDMS(variable)
             wpsLog.debug( "\n\n LLLLLLLOAD DataSet<%s:%s> %x:%x, status = '%s', var=%s, args=%s \n\n" % ( dataset.id, wid, id(dataset), os.getpid(), dataset._status_, name, str(cdms2_cache_args) ) )
             dset = variable( **cdms2_cache_args )
             rv = numpy.ma.fix_invalid( dset )
@@ -326,7 +326,7 @@ class DataManager:
             else:
                 wpsLog.debug( " *** Loading data from cache, cached region= %s" % str(cache_region) )
                 if (cache_type == CachedVariable.CACHE_OP) and (region is not None):
-                    variable = subset_variable_region( variable, region.toCDMS() )
+                    variable = subset_variable_region( variable, region.toCDMS(variable) )
                     cache_region = region
 
         if (variable is not None) and (cache_type <> CachedVariable.CACHE_NONE):

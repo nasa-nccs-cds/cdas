@@ -51,7 +51,7 @@ class KernelManager:
                     if dslice: region = Region( region, slice=dslice )
                 variable, data_spec, cached_region = self.dataManager.loadVariable( data, region, cache_type )
                 if (region is not None) and (cached_region <> region):
-                    subset_args = region.toCDMS()
+                    subset_args = region.toCDMS(variable)
                     variable = numpy.ma.fix_invalid( variable( **subset_args ) )
         #            wpsLog.debug( " $$$ Subsetting variable: args = %s\n >> in = %s\n >> out = %s " % ( str(subset_args), str(variable.squeeze().tolist()), str(subset_var.squeeze().tolist()) ))
         #        data_spec['data.region'] = region

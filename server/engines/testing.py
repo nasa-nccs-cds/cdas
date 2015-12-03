@@ -61,7 +61,7 @@ class EngineTests(unittest.TestCase):
         for item in kwargs.iteritems():
             self.assertEqual( status[item[0]], item[1] )
 
-    def test010_cache(self):
+    def xtest010_cache(self):
         result = self.engine.execute( TaskRequest( request={ 'domain': self.cache_region, 'variable': self.getData(), 'async': False } ) )
         print "result = %s" % str(result)
         self.assertEqual( result['cache_region'], self.cache_region )
@@ -101,7 +101,7 @@ class EngineTests(unittest.TestCase):
                     numtests = numtests + 1
             self.assertEqual( numtests, 2 )
 
-    def xtest02_departures(self):
+    def test02_departures(self):
         test_result = [  -1.405364990234375, -1.258880615234375, 0.840728759765625, 2.891510009765625, -18.592864990234375,
                         -11.854583740234375, -3.212005615234375, -5.311614990234375, 5.332916259765625, -1.698333740234375,
                           8.750885009765625, 11.778228759765625, 12.852447509765625 ]

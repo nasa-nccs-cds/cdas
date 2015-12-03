@@ -180,7 +180,6 @@ class Region(JSONObject):
         return axis_count
 
     def setStepSize( self, coord, step_size, axis ):
-#        debug_trace()
         axis_spec = self[ CDAxis.AXIS_LIST[ coord ] ]
         if axis_spec == None:
             axis_spec = { 'config':{'system':'indices'}, 'bounds':[], 'axis':'time' }
@@ -191,10 +190,12 @@ class Region(JSONObject):
             axis_spec = self.toIndexedAxis(axis_spec)
         bounds = axis_spec['bounds']
 
-    def toCDMS( self, **args ):
+    def toCDMS( self, variable, **args ):
         active_axes = args.get('axes',None)
         kargs = {}
         for k,axis_spec in self.iteritems():
+#            if k.find('lev') >= 0:
+#                debug_trace()
             if not active_axes or k in active_axes:
                 try:
                     if CDAxis.is_axis( axis_spec ):
@@ -207,7 +208,13 @@ class Region(JSONObject):
                                 if k == CDAxis.TIME:
                                     kargs[str(k)] = ( str(v[0]), str(v[1]), "cob" ) if ( len( v ) > 1 ) else ( str(v[0]), str(v[0]), "cob" )
                                 else:
-                                    kargs[str(k)] = ( float(v[0]), float(v[1]), "cob" ) if ( len( v ) > 1 ) else ( float(v[0]), float(v[0]), "cob" )
+                                    vbounds = [ v[0], v[0] ] if (len( v ) == 1) else list(v)
+                                    vbounds.append( "cob" )
+                                    axis = variable.getAxisList( [ k ] )[0]
+                                    interval = axis.mapInterval( vbounds )
+                                    if interval[0] >= interval[1]:
+                                        interval = [ interval[1], interval[1]+1 ]
+                                    kargs[str(k)] = slice(*interval)
                             else:
                                     kargs[str(k)] = slice(int(v[0]),int(v[1])) if ( len( v ) > 1 ) else slice(int(v[0]),int(v[0])+1)
                 except Exception, err:
@@ -322,7 +329,7 @@ class Domain(Region):
     def getVariable(self, subregion=None):
         if self._variable is None:
             self.load_persisted_data()
-        subset_args = subregion.toCDMS() if (subregion is not None) else None
+        subset_args = subregion.toCDMS(self._variable) if (subregion is not None) else None
         return self._variable if (subset_args is None) else numpy.ma.fix_invalid( self._variable( **subset_args ) )
 
     def setVariable( self, tvar ):
