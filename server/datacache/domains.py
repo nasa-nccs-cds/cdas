@@ -8,6 +8,16 @@ class RegionContainer(JSONObjectContainer):
     def newObject( self, spec ):
         return Region(spec)
 
+def to_float( v, index ):
+    try: return float(v[index])
+    except: return  None
+
+def get_bounds_args( isTime, v ):
+    if isTime:
+        return ( str(v[0]), str(v[1]), "cob" ) if ( len( v ) > 1 ) else ( str(v[0]), str(v[0]), "cob" )
+    else:
+        vf = [ to_float(v,i) for i in (0,1) ]
+        return None if (vf[0] is None) else[ vf[0], (vf[1] if (vf[1] is not None) else vf[0]), 'cob' ]
 
 class CDAxis(JSONObject):
     LEVEL = 'lev'
@@ -205,16 +215,18 @@ class Region(JSONObject):
                         is_indexed = ( system == 'indices' )
                         if (isinstance( v, list ) or isinstance( v, tuple )) and (len(v)>0):
                             if not is_indexed:
-                                if k == CDAxis.TIME:
-                                    kargs[str(k)] = ( str(v[0]), str(v[1]), "cob" ) if ( len( v ) > 1 ) else ( str(v[0]), str(v[0]), "cob" )
-                                else:
-                                    vbounds = [ v[0], v[0] ] if (len( v ) == 1) else list(v)
-                                    vbounds.append( "cob" )
-                                    axis = variable.getAxisList( [ k ] )[0]
-                                    interval = axis.mapInterval( vbounds )
-                                    if interval[0] >= interval[1]:
-                                        interval = [ interval[1], interval[1]+1 ]
-                                    kargs[str(k)] = slice(*interval)
+                                vbounds = get_bounds_args( (k == CDAxis.TIME), v )
+                                if vbounds:
+                                    if k == CDAxis.TIME:
+                                        kargs[str(k)] = vbounds
+                                    else:
+                                        axis = variable.getAxisList( [ k ] )[0]
+                                        interval = axis.mapInterval( vbounds )
+                                        if interval[1] is None:
+                                            interval = [ interval[0], interval[0]+1 ]
+                                        elif interval[0] >= interval[1]:
+                                            interval = [ interval[1], interval[1]+1 ]
+                                        kargs[str(k)] = slice(*interval)
                             else:
                                     kargs[str(k)] = slice(int(v[0]),int(v[1])) if ( len( v ) > 1 ) else slice(int(v[0]),int(v[0])+1)
                 except Exception, err:

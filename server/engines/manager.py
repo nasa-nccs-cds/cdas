@@ -232,7 +232,7 @@ class ComputeEngine( Executable ):
                     return task_monitor
 
                 results = self.processOpTask( task_monitor )
-                wpsLog.debug( " ***** Received operation [rid:%s] from worker '%s': results=%s " %  ( task_monitor.rid, str(designated_worker), str(results) ) )
+        #        wpsLog.debug( " ***** Received operation [rid:%s] from worker '%s': results=%s " %  ( task_monitor.rid, str(designated_worker), str(results) ) )
 
                 return results
 

@@ -70,32 +70,32 @@ class KernelTests(unittest.TestCase):
         self.assertEqual( Region(region_spec) , request_region )
 
     def test02_departures(self):
-        test_result = [  -1.405364990234375, -1.258880615234375, 0.840728759765625, 2.891510009765625, -18.592864990234375,
-                        -11.854583740234375, -3.212005615234375, -5.311614990234375, 5.332916259765625, -1.698333740234375,
-                          8.750885009765625, 11.778228759765625, 12.852447509765625 ]
+        test_result = [-3.29693603515625, -4.198516845703125, -4.247314453125, -3.934478759765625, 0.02935791015625, 1.18524169921875, 3.093414306640625, 3.30181884765625,
+                       2.87091064453125, 1.8109130859375, -0.725311279296875, -0.78521728515625, -0.73663330078125]
         task_args = self.getTaskArgs( op=self.getOp( 0 ) )
         result_spec = kernelMgr.run( TaskRequest( request=task_args ) )
         result_data = self.getResultData( result_spec )
+    #    print "result_data: ", str(result_data)
         self.assertEqual( test_result, result_data[0:len(test_result)] )
 
 
     def test03_annual_cycle(self):
-        test_result = [38.20164659288194, 40.60203721788194, 39.744038899739586, 37.738803439670136,
-                       34.758260091145836, 32.372643364800346, 33.70814344618056, 35.980190700954864,
-                       37.239708794487846, 38.93236626519097, 39.45347425672743, 35.83015611436632]
+        test_result = [283.121826171875, 282.06532118055554, 282.0176595052083, 282.59760199652777, 284.8202853732639, 287.36102973090277,
+                       288.89800347222223, 288.7062174479167, 287.56987847222223, 286.255126953125, 284.5141872829861, 283.2602267795139]
         task_args = self.getTaskArgs( self.getOp( 1 ), 1 )
         kernelMgr.persist()
         result_data = self.getResultData( kernelMgr.run( TaskRequest( request=task_args ) ) )
+    #    print "result_data: ", str(result_data)
         self.assertEqual( test_result, result_data[0:len(test_result)] )
 
     def test04_value_retreval(self):
-        test_result = 28.41796875
+        test_result = 285.666259765625
         task_args = self.getTaskArgs( self.getOp( 2 ), 2 )
         result_data =  self.getResultData( kernelMgr.run( TaskRequest( request=task_args ) ) )
         self.assertEqual( test_result, result_data )
 
     def test05_multitask(self):
-        test_results = [ [ -1.405364990234375, -1.258880615234375, 0.840728759765625 ], [ 48.07984754774306, 49.218166775173614, 49.36114501953125 ], 59.765625 ]
+        test_results = [ [ -3.29693603515625, -4.198516845703125, -4.247314453125 ], [280.96861436631946, 279.7786458333333, 279.4698079427083], 280.681884765625 ]
         task_args = self.getTaskArgs( op=self.operations )
         results = kernelMgr.run( TaskRequest( request=task_args ) )
         for ir, test_result in enumerate( test_results ):
@@ -104,15 +104,25 @@ class KernelTests(unittest.TestCase):
             else:                                   self.assertEqual( test_result, result )
 
     def test06_average(self):
-        test_result = [60.45402434065925, 59.35986168551339, 59.17586797470401, 58.17904816915278, 58.354240161557236, 58.90145082179115, 59.25474219650481 ]
+        test_result = [ 280.8800610838381, 280.9892993869274, 281.6702337237978, 282.263175115314, 283.2421639579057, 283.97856582467875, 284.1801476209755 ]
         op_domain = Region( { "lev": {"config":{},"bounds":[85000.0]}, "id":"r0" } )
         task_args = { 'domain': op_domain, 'variable': self.getData(), 'operation' : [ "CWT.average(*,axis:xy)" ],'embedded': True }
         result_data = self.getResultData( kernelMgr.run( TaskRequest( request=task_args ) ) )
+    #    print "result_data: ", str(result_data)
         self.assertEqual( test_result, result_data[0:len(test_result)] )
 
     def test07_ensemble_average(self):
-        test_result = [ 279.6803316230488, 279.7325255033889, 280.32625029619817, 280.9536142220719, 281.875403712933, 282.6501879774603, 282.9003404482816, 282.7242298368891, 282.048408536275 ]
+        test_result = [ 280.5660821022122, 280.6036305230575, 281.2833028260845, 281.93823648983914, 282.8928702717118, 283.6747343132441, 283.8997834538976, 283.72630654497095 ]
         op_domain = Region( { "lev": {"config":{},"bounds":[85000.0]}, "id":"r0" } )
         task_args = { 'domain': op_domain, 'variable': self.getEnsembleData(), 'operation' : [ "CWT.average(*,axis:xye)" ],'embedded': True }
         result_data = self.getResultData( kernelMgr.run( TaskRequest( request=task_args ) ) )
+     #   print "result_data: ", str(result_data)
         self.assertEqual( test_result, result_data[0:len(test_result)] )
+
+
+if __name__ == '__main__':
+    test_runner = unittest.TextTestRunner(verbosity=2)
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase( KernelTests )
+    test_runner.run( suite )
+
+
