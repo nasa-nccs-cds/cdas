@@ -258,7 +258,7 @@ if __name__ == "__main__":
         response    = kernelMgr.run( TaskRequest( request={ 'region': {'level': 85000}, 'data': getData() } ) )
         pp.pprint(response)
 
-    test_multitask()
+    read_test()
 
     # def test_api_cache():
     #     request_parameters = {'version': [u'1.0.0'], 'service': [u'WPS'], 'embedded': [u'true'], 'rawDataOutput': [u'result'], 'identifier': [u'cdas'], 'request': [u'Execute'] }

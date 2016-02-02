@@ -1,5 +1,6 @@
 import flask, time, traceback
 from request.manager import taskManager
+from modules import configuration
 from modules.utilities import wpsLog, DebugLogger
 from flask.ext.cors import CORS
 app = flask.Flask(__name__)
@@ -26,14 +27,14 @@ def cdas():
 
     #    resp = flask.make_response( json.dumps(result), 200 )
 
-@app.route('/shutdown/')
-def shutdown():
-    try:
-        taskManager.shutdown()
-        shutdown_server()
-    except Exception, err:
-        dlog.log( "Shutdown Error: %s\n%s" % (str(err), traceback.format_exc()) )
+# @app.route('/shutdown/')
+# def shutdown():
+#     try:
+#         taskManager.shutdown()
+#         shutdown_server()
+#     except Exception, err:
+#         dlog.log( "Shutdown Error: %s\n%s" % (str(err), traceback.format_exc()) )
 
 if __name__ == "__main__":
-    app.run()
+    app.run( port=configuration.CDAS_PORT )
     taskManager.shutdown()

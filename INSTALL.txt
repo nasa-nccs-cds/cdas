@@ -41,9 +41,8 @@ V. Use either flask or django/pyWPS to deploy the service:
    >> cd /usr/local/web/WPCDAS/server/web_servers/flask_framework
    >> mpiexec -np 1 python manage.py
 
-   CDAS will now be receiving GET requests at http://localhost:5000/cdas
-   CDAS can be shutdown using http://localhost:5000/shutdown/
-   ( Or http://127.0.0.1:5000/shutdown/ )
+   CDAS will now be receiving GET requests at http://localhost:5075/cdas
+   The port is specified by the CDAS_PORT configuration parameter.
 
  2) Using Django/pyWPS:
 
