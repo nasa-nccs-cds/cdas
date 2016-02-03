@@ -36,5 +36,5 @@ def cdas():
 #         dlog.log( "Shutdown Error: %s\n%s" % (str(err), traceback.format_exc()) )
 
 if __name__ == "__main__":
-    app.run( port=configuration.CDAS_PORT )
+    app.run( host='0.0.0.0', port=configuration.CDAS_PORT )
     taskManager.shutdown()
