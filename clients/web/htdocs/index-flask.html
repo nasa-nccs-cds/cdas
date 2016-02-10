@@ -2,7 +2,7 @@
   <body>
   	<h1> WPS Demo: Local Test</h1>
   	<hr>
-  	<h2> <a href='view-source:http://localhost:5000/cdas?version=1.0.0&service=WPS&embedded=true&async=false&rawDataOutput=result&request=Execute&identifier=cdas&datainputs=[domain={"id":"d0","latitude":[30.0],"longitude":[10.0],"level":{"start":5,"end":6,"system":"indices"}};variable={"dset":"MERRA/mon/atmos","id":"v0:ta","domain":"d0"};operation=["cdtime.departures($0,slice:t)"];]'> Extract Timeseries From NetCDF File </a> </h2>
+  	<h2> <a href='view-source:http://localhost:5075/cdas/?version=1.0.0&service=WPS&embedded=true&async=false&rawDataOutput=result&request=Execute&identifier=cdas&datainputs=[domain={%22id%22:%22d0%22,%22latitude%22:[30.0],%22longitude%22:[10.0],%22level%22:{%22start%22:5,%22end%22:6,%22system%22:%22indices%22}};variable={%22dset%22:%22MERRA/mon/atmos%22,%22id%22:%22v0:ta%22,%22domain%22:%22d0%22};operation=[%22CDTime.departures($0,slice:t)%22];]'> Extract Timeseries From NetCDF File </a> </h2>
 		<pre><font size="5"><code>  http://localhost/cdas?version=1.0.0&service=wps&request=<b>Execute</b>&identifier=<i>cdas</i><p></p>  &datainputs=[<p></p>    domain=[{"id":"d0","lat":30.0,"lon":10.0,"level":{"start":5,"end":6,"system":"indices"}}];<p></p>    variable={"dset":"MERRA/mon/atmos","id":"v0:ta","domain":"d0"};<p></p>    operation=["cdtime.departures($0,slice:t)"];<p></p>  ] </code></font></pre>
  	<hr>
   </body>
