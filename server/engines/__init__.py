@@ -13,7 +13,7 @@ class EngineRegistry(ModuleRegistry):
         ModuleRegistry.__init__( self, name, directory, package_path, current_module=current_compute_engine, **args )
 
     def getWorkerIntracom( self, key  ):
-        class_instance = self._registry.get( key, None )
+        class_instance = self._registry.get( key.lower(), None )
         intracom = class_instance.getWorkerIntracom()
 #         wpsLog.debug( "\n\n getWorkerIntracom::------->  Using %s '%s': %s, %s \n\n" % ( self.name, key, str(class_instance), str(intracom) ) )
         return intracom

@@ -21,7 +21,7 @@ class DomainRegistry:
     def createDomain(self, partIndex, domainSpec ):
         domain = Domain( domainSpec )
         id = self.generateDomainId( domainSpec )
-        self._registry[ id ] = domain
+        self._registry[ id.lower() ] = domain
         wpsLog.info( "Create domain '%s', Domain Cache: %s " % ( id, str( self._registry ) ) )
         return id
 
@@ -33,11 +33,11 @@ class DomainRegistry:
 
     def getDomain(self, domainId ):
         wpsLog.info( "Get domain '%s', Domain Cache: %s " % ( domainId, str( self._registry ) ) )
-        return self._registry.get( domainId, None )
+        return self._registry.get( domainId.lower(), None )
 
     def removeDomain( self, domainId ):
         try:
-            del self._registry[domainId]
+            del self._registry[domainId.lower()]
         except KeyError:
             wpsLog.error( "Attempt to delete non-existent domain: %s" % ( domainId ) )
 
