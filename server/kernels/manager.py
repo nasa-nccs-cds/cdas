@@ -135,7 +135,7 @@ class KernelManager:
         from kernels import kernelRegistry
         if operation:
             kernel_id = operation.get('kernel','base')
-            kernel = kernelRegistry.getInstance( kernel_id )
+            kernel = kernelRegistry.getInstance( kernel_id.lower )
             if kernel == None:
                 raise Exception( "No compute kernel found for operations %s" % str(operation) )
             return kernel
