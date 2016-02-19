@@ -19,22 +19,22 @@ class ModuleRegistry:
                     module = importlib.import_module( "."+modulename, package_path )
                     if hasattr( module, 'getConstructor' ):
                         constructor = module.getConstructor()
-                        self._registry[modulename.lower] = constructor
+                        self._registry[modulename.lower()] = constructor
      #                   wpsLog.debug( " %%---> Registering %s '%s'" % ( self.name, modulename ) )
                 except Exception, err:
                     wpsLog.warning( "\n --------------- Error Registering %s '%s' --------------- \n %s\n%s" % ( self.name, modulename, str(err), traceback.format_exc() ) )
 
     def getInstance( self, key  ):
-        instance = self._instances.get( key.lower, None )
+        instance = self._instances.get( key.lower(), None )
         if instance is None:
-            constructor = self._registry.get( key.lower, None )
+            constructor = self._registry.get( key.lower(), None )
             wpsLog.debug( "  Using %s '%s': %s " % ( self.name, key, str(type(constructor)) ) )
             instance = constructor(key)
-            self._instances[key.lower] = instance
+            self._instances[key.lower()] = instance
         return instance
 
     def getClassInstance( self, key  ):
-        constructor = self._registry.get( key.lower, None )
+        constructor = self._registry.get( key.lower(), None )
         return constructor
 
     def call_dbg(self, msg):

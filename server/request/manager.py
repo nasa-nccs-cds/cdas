@@ -134,7 +134,7 @@ def test01():
 
 def test02():
     request_parameters = {'version': [u'1.0.0'], 'service': [u'WPS'], 'embedded': [u'true'], 'rawDataOutput': [u'result'], 'identifier': [u'cdas'], 'request': [u'Execute'] }
-    request_parameters['datainputs'] = [u'[region={"longitude":-142.5,"latitude":-15.635426330566418,"level":100000,"time":"2010-01-16T12:00:00"};data={ dset="MERRA/mon/atmos": [ "v0:hur", "v1:clt" ] };operation=["CDTime.departures(v0,v1,slice:t)","CDTime.climatology(v0,slice:t,bounds:annualcycle)","CDTime.value(v0)"];]']
+    request_parameters['datainputs'] = [u'[region={"longitude":-142.5,"latitude":-15.635426330566418,"level":100000,"time":"2010-01-16T12:00:00"};data={ "dset"="MERRA/mon/atmos": [ "v0:hur", "v1:clt" ] };operation=["CDTime.departures(v0,v1,slice:t)","CDTime.climatology(v0,slice:t,bounds:annualcycle)","CDTime.value(v0)"];]']
     response_json = taskManager.processRequest( request_parameters )
     responses = json.loads(response_json)
     print "Responses:"
